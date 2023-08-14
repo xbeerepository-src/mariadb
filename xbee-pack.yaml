@@ -68,25 +68,27 @@ const:
   sysfolder: /etc/mysql
   datadir: /srv/mysql
 
-in:
+var:
   version: 10.6.7
   port: 3306
+
+in:
   password: password
 
 
+builder: ./mariadb-builder
 
-dependencies:
-  - ./mariadb-builder
-  - expect
-  - tcl
+dependency: expect
+
+volume: "{{ .datadir }}"
 
 provision:
-  - folder: "{% sysfolder %}"
+  - folder: "{{ .sysfolder }}"
   - copy:
       template: my.cnf
-      todir: "{% sysfolder %}"
+      todir: "{{ .sysfolder }}"
   - shell: 
       cmds:
-        - mysql_install_db --basedir=/usr --datadir={% datadir %} --user={% xbeeUser %} && chown -R {% xbeeUser %}:{% xbeeGroup %} {% datadir %}
-        - install -v -m755 -o {% xbeeUser %} -g {% xbeeGroup %} -d /run/mysqld
-        - "{{ .templates }}/password.sh"
+        - mysql_install_db --basedir=/usr --datadir={{ .datadir }} --user={{ .xbee.user }} && chown -R {{ .xbee.user }}:{{ .xbee.group }} {{ .datadir }}
+        - install -v -m755 -o {{ .xbee.user }} -g {{ .xbee.group }} -d /run/mysqld
+        - "{{ .xbee.templates }}/password.sh"
