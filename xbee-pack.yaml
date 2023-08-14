@@ -66,7 +66,7 @@ description: |
 
 const:
   sysfolder: /etc/mysql
-  datadir: /srv/mysql
+  datadir: /var/lib/mysql
 
 var:
   version: 10.6.7
@@ -87,8 +87,7 @@ provision:
   - copy:
       template: my.cnf
       todir: "{{ .sysfolder }}"
-  - shell: 
-      cmds:
-        - mysql_install_db --basedir=/usr --datadir={{ .datadir }} --user={{ .xbee.user }} && chown -R {{ .xbee.user }}:{{ .xbee.group }} {{ .datadir }}
-        - install -v -m755 -o {{ .xbee.user }} -g {{ .xbee.group }} -d /run/mysqld
-        - "{{ .xbee.templates }}/password.sh"
+
+
+up: "{{ .xbee.templates }}/up.sh"
+down: mysqladmin shutdown -uroot -p {{ .password }}
